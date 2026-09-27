@@ -112,6 +112,54 @@ print(f"10M sum = {s} calculated in {round((time.time() - t0)*1000, 2)} ms!")
 | **Plain 10 Million Loop Sum** | 1399.92 ms (1.40s) | **10.84 ms (0.01s)** | **129.1x FASTER!** 🚀 |
 | **Manual `source .venv/bin/activate`** | Required | **NOT Required (Auto-detected)** | **Zero Friction** ✨ |
 
+#### 🛠️ Deep Dive: How `uv`, `pip`, and `venv` Work with ZenithPy
+
+##### 1. How to tell Astral `uv` to use ZenithPy:
+By default, `uv run <script.py>` executes standard CPython. To execute your scripts with ZenithPy acceleration within a `uv` project, you have three flexible methods:
+
+- **Method A — Direct `uv run` (Recommended):**
+  `uv run` can launch any executable within the project environment. Simply specify `zenith`:
+  ```bash
+  uv run zenith main.py
+  # or
+  uv run zenithpy main.py
+  ```
+  `uv` sets up the project context and dependencies, while `zenith` executes with raw assembly optimizations.
+
+- **Method B — Zero-Activation Auto-Discovery (Easiest):**
+  You don't even need `uv run`! ZenithPy automatically climbs the directory tree to find your `.venv` and injects all installed packages into `sys.path`:
+  ```bash
+  zenith main.py
+  ```
+
+- **Method C — Specifying Python Interpreter to `uv`:**
+  ZenithPy supports standard Python introspection flags (`-I`, `-S`, `-s`, `-V`), allowing `uv` to query it directly:
+  ```bash
+  uv run --python zenithpy main.py
+  ```
+
+##### 2. Package Installation with `pip`:
+Standard `pip` is 100% supported across all workflows:
+- **Via Zenith CLI:**
+  ```bash
+  zenithpy -m pip install <package_name>
+  ```
+- **Via Virtual Environment Pip:**
+  ```bash
+  .venv/bin/pip install <package_name>
+  ```
+- **Via Astral `uv pip` (Ultra-Fast):**
+  ```bash
+  uv pip install <package_name>
+  ```
+All packages (pure Python wheels, C-extensions, complex frameworks like LangChain, NumPy, PyTorch) install into the `.venv` and are instantly accessible.
+
+##### 3. Virtual Environment Creation (`zenithpy -m venv .venv`):
+Running `zenithpy -m venv .venv`:
+- Generates a full standard virtual environment containing `bin/python`, `bin/pip`, and activation scripts (`activate`).
+- **Automatic Symlink Injection:** Automatically generates symlinks `bin/zenith` and `bin/zenithpy` inside `.venv/bin/` so that the accelerated runtime is available directly within the active environment.
+
+
 
 
 
