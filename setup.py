@@ -22,6 +22,8 @@ setup(
     entry_points={
         "console_scripts": [
             "zenithpy = zenithpy.cli:main",
+            "zenith = zenithpy.cli:main",
         ],
+
     },
 )

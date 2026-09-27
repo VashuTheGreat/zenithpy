@@ -8,6 +8,27 @@ ZenithPy is an ultra-high-performance, low-level Python runtime and native JIT e
 
 ---
 
+## ⚡ Quick Install (Single Command)
+
+Anyone can install ZenithPy instantly with a single command:
+
+```bash
+# Method 1: Via pip (Recommended)
+pip install git+https://github.com/vashuthegreat7832-lang/zenithpy.git
+
+# Method 2: Via curl (One-line installer)
+curl -fsSL https://raw.githubusercontent.com/vashuthegreat7832-lang/zenithpy/main/install.sh | bash
+```
+
+Once installed, simply run any Python file from anywhere:
+```bash
+zenithpy filename.py
+# or simply:
+zenith filename.py
+```
+
+---
+
 ## 🌟 Zero Friction Migration: Zero Decorators, Zero Code Changes
 
 ZenithPy is designed so that **you do not need to change a single line of your Python code**.
@@ -15,15 +36,16 @@ ZenithPy is designed so that **you do not need to change a single line of your P
 - ❌ **No imports required** (you don't even need `import zenithpy`).
 - ✅ **100% Standard Python Compatibility** (all standard libraries `os`, `sys`, `json`, `math`, `asyncio`, classes, and exceptions work out of the box).
 
-### How to Use:
-Simply run your existing, unmodified Python script with the `zenithpy` CLI:
+### How to Run:
+Simply run your existing, unmodified Python script:
 ```bash
-# Standard Python:
+# Standard Python (slow):
 python3 my_script.py
 
 # With ZenithPy (up to 162x faster automatically):
 zenithpy my_script.py
 ```
+
 
 ### Verified Performance on Plain, Unannotated Python Code:
 Testing identical, zero-decorator Python code ([`tests/test_plain_python.py`](tests/test_plain_python.py)):
