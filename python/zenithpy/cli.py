@@ -24,9 +24,11 @@ def main():
     if python_dir not in sys.path:
         sys.path.insert(0, python_dir)
 
+    from zenithpy.auto_optimizer import optimize_and_exec
+
     if sys.argv[1] == "-c" and len(sys.argv) > 2:
         code = sys.argv[2]
-        exec(code, {"__name__": "__main__"})
+        optimize_and_exec(code, "<string>", {"__name__": "__main__", "__builtins__": __builtins__})
         return
 
     script_path = sys.argv[1]
@@ -36,8 +38,16 @@ def main():
         print(f"Error: Script '{script_path}' not found.", file=sys.stderr)
         sys.exit(1)
 
-    # Run script with full Python globals and standard library support
-    runpy.run_path(script_path, run_name="__main__")
+    with open(script_path, "r", encoding="utf-8") as f:
+        source_code = f.read()
+
+    global_dict = {
+        "__name__": "__main__",
+        "__file__": os.path.abspath(script_path),
+        "__builtins__": __builtins__,
+    }
+    optimize_and_exec(source_code, script_path, global_dict)
 
 if __name__ == "__main__":
     main()
+

@@ -37,7 +37,12 @@ echo -n "Testing 100% Full Standard Python Compatibility (OOP, stdlib, exception
 python3 tests/test_full_compatibility.py > /dev/null 2>&1
 echo "PASS ✓"
 
+echo -n "Testing Zero-Decorator Plain Python via zenithpy CLI... "
+zenithpy tests/test_plain_python.py > /dev/null 2>&1
+echo "PASS ✓"
+
 echo "=========================================="
-echo "All tests passed! (5 / 5)"
+echo "All tests passed! (6 / 6)"
 echo "=========================================="
+
 
