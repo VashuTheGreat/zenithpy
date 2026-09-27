@@ -54,24 +54,68 @@ return _native.asm_prime_count(int({param_name}))
 
     def visit_For(self, node):
         self.generic_visit(node)
-        # Detect: for i in range(N): total += i
-        # and optimize directly to hardware loop sum
+        # Detect numeric loops: for <var> in range(...)
         if isinstance(node.iter, ast.Call) and getattr(node.iter.func, 'id', None) == 'range':
-            if len(node.iter.args) == 1 and len(node.body) == 1:
+            range_args = node.iter.args
+            if 1 <= len(range_args) <= 3 and len(node.body) == 1 and isinstance(node.target, ast.Name):
                 stmt = node.body[0]
-                if isinstance(stmt, ast.AugAssign) and isinstance(stmt.op, ast.Add):
-                    if isinstance(stmt.value, ast.Name) and isinstance(node.target, ast.Name):
-                        if stmt.value.id == node.target.id:
-                            target_var = stmt.target.id
-                            range_arg = node.iter.args[0]
-                            # Replace whole loop with: target_var += _native.asm_loop_sum(N)
-                            opt_code = ast.parse(f"""
+                if isinstance(stmt, ast.AugAssign) and isinstance(stmt.target, ast.Name):
+                    loop_var = node.target.id
+                    accum_var = stmt.target.id
+                    op_type = type(stmt.op)
+
+                    # Fastpath 1: Simple total += i (Handcrafted raw assembly)
+                    if op_type is ast.Add and isinstance(stmt.value, ast.Name) and stmt.value.id == loop_var and len(range_args) == 1:
+                        opt_code = ast.parse(f"""
 import zenith_accelerator as _native
-{target_var} += _native.asm_loop_sum(int(0))
+{accum_var} += _native.asm_loop_sum(int(0))
 """).body[1]
-                            # plug in range_arg
-                            opt_code.value.args[0] = range_arg
-                            return opt_code
+                        opt_code.value.args[0] = range_args[0]
+                        return opt_code
+
+                    # Fastpath 2: General arithmetic loop (total += (i * i) % 7, etc.)
+                    if op_type in (ast.Add, ast.Sub):
+                        try:
+                            from zenithpy.loop_compiler import compile_numeric_loop
+                            res = compile_numeric_loop(loop_var, accum_var, op_type, stmt.value)
+                            if res is not None:
+                                code_hash, free_vars = res
+                                if len(range_args) == 1:
+                                    start_node = ast.Constant(value=0)
+                                    stop_node = range_args[0]
+                                    step_node = ast.Constant(value=1)
+                                elif len(range_args) == 2:
+                                    start_node = range_args[0]
+                                    stop_node = range_args[1]
+                                    step_node = ast.Constant(value=1)
+                                else:
+                                    start_node = range_args[0]
+                                    stop_node = range_args[1]
+                                    step_node = range_args[2]
+
+                                call_args = [
+                                    ast.Constant(value=code_hash),
+                                    start_node,
+                                    stop_node,
+                                    step_node,
+                                    ast.Name(id=accum_var, ctx=ast.Load()),
+                                ]
+                                for fv in free_vars:
+                                    call_args.append(ast.Name(id=fv, ctx=ast.Load()))
+
+                                call_node = ast.Call(
+                                    func=ast.Name(id="_zenith_exec_loop", ctx=ast.Load()),
+                                    args=call_args,
+                                    keywords=[],
+                                )
+                                assign_node = ast.Assign(
+                                    targets=[ast.Name(id=accum_var, ctx=ast.Store())],
+                                    value=call_node,
+                                )
+                                ast.fix_missing_locations(assign_node)
+                                return assign_node
+                        except Exception:
+                            pass
 
         return node
 
@@ -80,12 +124,15 @@ def optimize_and_exec(source_code: str, filename: str, global_dict: dict):
     Parses plain, unannotated Python source code, applies ZenithPy automatic
     assembly AST optimizations, and executes with 100% Python compatibility.
     """
+    from zenithpy.loop_compiler import execute_native_loop
+    global_dict["_zenith_exec_loop"] = execute_native_loop
+    global_dict["_native"] = _native
+
     tree = ast.parse(source_code, filename=filename)
     transformer = AutoAccelerator()
     optimized_tree = transformer.visit(tree)
     ast.fix_missing_locations(optimized_tree)
 
-    global_dict["_native"] = _native
     compiled = compile(optimized_tree, filename=filename, mode="exec")
     exec(compiled, global_dict)
 

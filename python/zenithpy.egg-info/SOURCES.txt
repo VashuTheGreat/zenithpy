@@ -5,6 +5,7 @@ python/zenithpy/__init__.py
 python/zenithpy/accelerator.py
 python/zenithpy/auto_optimizer.py
 python/zenithpy/cli.py
+python/zenithpy/loop_compiler.py
 python/zenithpy.egg-info/PKG-INFO
 python/zenithpy.egg-info/SOURCES.txt
 python/zenithpy.egg-info/dependency_links.txt

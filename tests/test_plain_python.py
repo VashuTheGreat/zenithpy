@@ -49,3 +49,13 @@ p_count = count_primes(15000)
 t1 = time.time()
 print(f"  Result: Primes <= 15000 = {p_count}")
 print(f"  Execution Time: {round((t1 - t0) * 1000, 2)} ms ({round(t1 - t0, 4)} s)")
+
+print("\n=== 5. Arbitrary Arithmetic Loop (total += (i * i) % 7) ===")
+t0 = time.time()
+total_math = 0
+for i in range(5000000):
+    total_math += (i * i) % 7
+t1 = time.time()
+print(f"  Result: 5M Math Loop = {total_math}")
+print(f"  Execution Time: {round((t1 - t0) * 1000, 2)} ms ({round(t1 - t0, 4)} s)")
+
