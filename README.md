@@ -46,6 +46,26 @@ python3 my_script.py
 zenithpy my_script.py
 ```
 
+### Virtual Environments (`venv`), `pip`, & `uv` Package Management:
+ZenithPy is 100% integrated with standard Python package workflows:
+
+```bash
+# 1. Create a virtual environment using zenithpy:
+zenithpy -m venv .venv
+
+# 2. Or create a virtual environment using astral's uv:
+uv venv .venv
+
+# 3. Install any library (LangChain, PyTorch, NumPy, FastAPI, etc.):
+uv pip install langchain-core
+# or:
+.venv/bin/pip install langchain-core
+
+# 4. Run your script: ZenithPy automatically detects .venv and all installed packages!
+zenith main.py
+```
+
+
 
 ### Verified Performance on Plain, Unannotated Python Code:
 Testing identical, zero-decorator Python code ([`tests/test_plain_python.py`](tests/test_plain_python.py)):
