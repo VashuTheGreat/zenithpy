@@ -1,2 +1,3 @@
 [console_scripts]
+zenith = zenithpy.cli:main
 zenithpy = zenithpy.cli:main
