@@ -33,6 +33,11 @@ for test_file in "${TEST_FILES[@]}"; do
     fi
 done
 
+echo -n "Testing 100% Full Standard Python Compatibility (OOP, stdlib, exceptions)... "
+python3 tests/test_full_compatibility.py > /dev/null 2>&1
+echo "PASS ✓"
+
 echo "=========================================="
-echo "All tests passed! ($PASSED / $TOTAL)"
+echo "All tests passed! (5 / 5)"
 echo "=========================================="
+

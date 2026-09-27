@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: zenithpy
+Version: 0.2.0
+Summary: Hyper-Optimized Python Runtime & Native Assembly Engine (100% Python Compatibility)
+Author: Vashu
+License-File: LICENSE
+Dynamic: author
+Dynamic: license-file
+Dynamic: summary

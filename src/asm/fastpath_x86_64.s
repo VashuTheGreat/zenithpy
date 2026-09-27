@@ -321,3 +321,94 @@ zenith_asm_invoke_jit:
     popq %rbp
     ret
 
+.globl zenith_asm_prime_count
+.align 16
+zenith_asm_prime_count:
+    # int64_t zenith_asm_prime_count(int64_t limit)
+    # %rdi = limit
+    pushq %rbx
+    pushq %r12
+    pushq %r13
+
+    movq %rdi, %r12        # r12 = limit
+    xorq %rbx, %rbx        # rbx = prime count
+    movq $2, %r13          # r13 = candidate n
+
+.Lprime_outer:
+    cmpq %r12, %r13
+    jg .Lprime_done
+
+    movq $2, %rcx          # rcx = divisor d
+.Lprime_inner:
+    movq %rcx, %rax
+    imulq %rcx, %rax       # rax = d * d
+    cmpq %r13, %rax
+    jg .Lprime_is_prime
+
+    # Check n % d == 0
+    movq %r13, %rax
+    xorq %rdx, %rdx
+    divq %rcx
+    testq %rdx, %rdx
+    jz .Lprime_not_prime
+
+    incq %rcx
+    jmp .Lprime_inner
+
+.Lprime_is_prime:
+    incq %rbx
+
+.Lprime_not_prime:
+    incq %r13
+    jmp .Lprime_outer
+
+.Lprime_done:
+    movq %rbx, %rax
+    popq %r13
+    popq %r12
+    popq %rbx
+    ret
+
+.globl zenith_asm_mandel_pixel
+.align 16
+zenith_asm_mandel_pixel:
+    # int64_t zenith_asm_mandel_pixel(double cr, double ci, int64_t max_iter)
+    # %xmm0 = cr, %xmm1 = ci, %rdi = max_iter
+    xorpd %xmm2, %xmm2     # zr = 0.0
+    xorpd %xmm3, %xmm3     # zi = 0.0
+    movabsq $0x4010000000000000, %rax # 4.0 in IEEE 754
+    movq %rax, %xmm4
+    xorq %rax, %rax        # iter = 0
+
+.Lmandel_loop:
+    cmpq %rdi, %rax
+    jge .Lmandel_done
+
+    movapd %xmm2, %xmm5
+    mulsd %xmm5, %xmm5     # zr2 = zr * zr
+
+    movapd %xmm3, %xmm6
+    mulsd %xmm6, %xmm6     # zi2 = zi * zi
+
+    movapd %xmm5, %xmm7
+    addsd %xmm6, %xmm7     # zr2 + zi2
+    ucomisd %xmm4, %xmm7
+    ja .Lmandel_done
+
+    # zi = 2.0 * zr * zi + ci
+    addsd %xmm3, %xmm3     # 2 * zi
+    mulsd %xmm2, %xmm3     # 2 * zi * zr
+    addsd %xmm1, %xmm3     # 2 * zi * zr + ci
+
+    # zr = zr2 - zi2 + cr
+    subsd %xmm6, %xmm5     # zr2 - zi2
+    addsd %xmm0, %xmm5     # zr2 - zi2 + cr
+    movapd %xmm5, %xmm2
+
+    incq %rax
+    jmp .Lmandel_loop
+
+.Lmandel_done:
+    ret
+
+

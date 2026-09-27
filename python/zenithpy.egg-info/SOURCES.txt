@@ -1,0 +1,15 @@
+LICENSE
+README.md
+setup.py
+python/zenithpy/__init__.py
+python/zenithpy/accelerator.py
+python/zenithpy/cli.py
+python/zenithpy.egg-info/PKG-INFO
+python/zenithpy.egg-info/SOURCES.txt
+python/zenithpy.egg-info/dependency_links.txt
+python/zenithpy.egg-info/entry_points.txt
+python/zenithpy.egg-info/top_level.txt
+tests/test_arithmetic.py
+tests/test_functions.py
+tests/test_lists.py
+tests/test_loops.py

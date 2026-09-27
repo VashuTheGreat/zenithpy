@@ -1,19 +1,27 @@
-from setuptools import setup, Extension
+from setuptools import setup, find_packages
+from setuptools.command.build_py import build_py
+import subprocess
+import shutil
 import os
 
-extra_compile_args = ["-O3", "-march=native", "-mavx2", "-mfma"]
-
-zenith_module = Extension(
-    "zenith_accelerator",
-    sources=["src/zenith_extension.c", "src/asm/fastpath_x86_64.s"],
-    extra_compile_args=extra_compile_args,
-)
+class CustomBuildPy(build_py):
+    def run(self):
+        # Run make to compile binary and shared object
+        repo_root = os.path.dirname(os.path.abspath(__file__))
+        subprocess.run(["make"], cwd=repo_root, check=True)
+        super().run()
 
 setup(
     name="zenithpy",
-    version="0.1.0",
-    description="Hyper-Optimized Python Runtime & Native Assembly Engine",
-    ext_modules=[zenith_module],
+    version="0.2.0",
+    description="Hyper-Optimized Python Runtime & Native Assembly Engine (100% Python Compatibility)",
+    author="Vashu",
     packages=["zenithpy"],
     package_dir={"": "python"},
+    cmdclass={"build_py": CustomBuildPy},
+    entry_points={
+        "console_scripts": [
+            "zenithpy = zenithpy.cli:main",
+        ],
+    },
 )
