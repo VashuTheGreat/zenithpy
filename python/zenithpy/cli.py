@@ -76,17 +76,39 @@ def main():
     if python_dir not in sys.path:
         sys.path.insert(0, python_dir)
 
-    arg1 = sys.argv[1]
+    # Scan and skip standard python interpreter flags (e.g. -I, -S, -s, -u, -B, etc.)
+    idx = 1
+    while idx < len(sys.argv):
+        arg = sys.argv[idx]
+        if arg in ("-I", "-S", "-s", "-B", "-u", "-E", "-O", "-OO", "-v", "-q", "-d", "-i"):
+            idx += 1
+            continue
+        elif arg.startswith("-W") or arg.startswith("-X"):
+            if arg in ("-W", "-X") and idx + 1 < len(sys.argv):
+                idx += 2
+            else:
+                idx += 1
+            continue
+        elif arg == "--":
+            idx += 1
+            break
+        else:
+            break
+
+    if idx >= len(sys.argv):
+        return
+
+    arg = sys.argv[idx]
 
     # 1. Version flag
-    if arg1 in ("-V", "--version"):
+    if arg in ("-V", "--version"):
         print(f"Python {sys.version.split()[0]} (ZenithPy 0.2.0, x86_64 native JIT)")
         return
 
     # 2. Module execution flag (-m <module>)
-    if arg1 == "-m" and len(sys.argv) > 2:
-        mod_name = sys.argv[2]
-        remaining_args = sys.argv[2:]
+    if arg == "-m" and idx + 1 < len(sys.argv):
+        mod_name = sys.argv[idx + 1]
+        remaining_args = sys.argv[idx + 1:]
         sys.argv = remaining_args
 
         # Execute target module
@@ -105,15 +127,16 @@ def main():
         return
 
     # 3. Inline code flag (-c <code>)
-    if arg1 == "-c" and len(sys.argv) > 2:
-        code = sys.argv[2]
+    if arg == "-c" and idx + 1 < len(sys.argv):
+        code = sys.argv[idx + 1]
+        sys.argv = ["-c"] + sys.argv[idx + 2:]
         from zenithpy.auto_optimizer import optimize_and_exec
         optimize_and_exec(code, "<string>", {"__name__": "__main__", "__builtins__": __builtins__})
         return
 
     # 4. Standard script execution (zenithpy script.py)
-    script_path = sys.argv[1]
-    sys.argv = sys.argv[1:]  # shift argv so script receives correct args
+    script_path = sys.argv[idx]
+    sys.argv = sys.argv[idx:]  # shift argv so script receives correct args
 
     if not os.path.exists(script_path):
         print(f"Error: Script '{script_path}' not found.", file=sys.stderr)
