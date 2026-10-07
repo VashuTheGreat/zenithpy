@@ -1,7 +1,7 @@
 # ZenithPy: Hyper-Optimized Python Runtime & Native JIT Engine
 
-[![Language](https://img.shields.io/badge/Language-x86--64%20Assembly%20%7C%20C%2FC%2B%2B-blue.svg)](https://github.com/vashuthegreat7832-lang/zenithpy)
-[![Speedup](https://img.shields.io/badge/Speedup-Up%20to%20162x%20vs%20CPython-brightgreen.svg)](https://github.com/vashuthegreat7832-lang/zenithpy)
+[![Language](https://img.shields.io/badge/Language-x86--64%20Assembly%20%7C%20C%2FC%2B%2B-blue.svg)](https://github.com/VashuTheGreat/zenithpy)
+[![Speedup](https://img.shields.io/badge/Speedup-Up%20to%20162x%20vs%20CPython-brightgreen.svg)](https://github.com/VashuTheGreat/zenithpy)
 [![License](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
 
 ZenithPy is an ultra-high-performance, low-level Python runtime and native JIT execution engine engineered from scratch in **raw x86-64 Assembly** and **C**. It offers **100% drop-in compatibility with standard Python** (supporting classes, all standard libraries, exceptions, decorators, and generators) while delivering up to **162x speedup** on compute-bound loops and **32x** on recursion, dramatically outperforming CPython 3.14 and Node.js (V8).
@@ -14,10 +14,10 @@ Anyone can install ZenithPy instantly with a single command:
 
 ```bash
 # Method 1: Via pip (Recommended)
-pip install git+https://github.com/vashuthegreat7832-lang/zenithpy.git
+pip install git+https://github.com/VashuTheGreat/zenithpy.git
 
 # Method 2: Via curl (One-line installer)
-curl -fsSL https://raw.githubusercontent.com/vashuthegreat7832-lang/zenithpy/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/VashuTheGreat/zenithpy/main/install.sh | bash
 ```
 
 Once installed, simply run any Python file from anywhere:
@@ -307,7 +307,7 @@ dot = zenith.asm_vector_dot(vec_a, vec_b)
 
 ### Building the Runtime
 ```bash
-git clone https://github.com/vashuthegreat7832-lang/zenithpy.git
+git clone https://github.com/VashuTheGreat/zenithpy.git
 cd zenithpy
 make
 ```
